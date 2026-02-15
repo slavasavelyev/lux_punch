@@ -1,0 +1,7 @@
+{
+  "weight_kg": 70.0,
+  "height_cm": 175.0,
+  "vel_threshold": 2.0,
+  "acc_threshold": 8.0,
+  "last_pixel_to_meter": null
+}

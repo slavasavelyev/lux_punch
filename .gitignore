@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+.venv*/
+pip-wheel-metadata/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Logs / exports
+*.log
+*.csv
+
+# Lux Punch runtime settings (generated locally)
+user_settings.json
+
+# PyInstaller
+build/
+dist/
+*.manifest
+*.spec  # generated specs (we keep our template under packaging/windows/)
+!packaging/windows/*.spec

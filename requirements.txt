@@ -1,0 +1,11 @@
+# Runtime dependencies for Lux Punch
+#
+# Notes:
+# - MediaPipe versions evolve quickly. This project relies on `mediapipe.solutions.pose`.
+#   A regression was reported in mediapipe==0.10.31 where `mediapipe.solutions` was missing on some systems.
+#   We exclude that version by default.
+opencv-python>=4.5
+mediapipe!=0.10.31,>=0.10.21
+numpy>=1.24
+PyQt5>=5.15
+matplotlib>=3.6
