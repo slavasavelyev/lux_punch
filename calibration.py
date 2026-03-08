@@ -1,42 +1,29 @@
-"""Calibration utilities for mapping pixel motion to metric motion."""
 
-from __future__ import annotations
+from pose_utils import pixel_distance, LEFT_SHOULDER, RIGHT_SHOULDER
 
-from pose_utils import LEFT_SHOULDER, RIGHT_SHOULDER, pixel_distance
-
-DEFAULT_SHOULDER_RATIO = 0.22
-DEFAULT_FALLBACK_SHOULDER_WIDTH_M = 0.45
-
-
-def estimate_pixel_to_meter(
-    landmarks,
-    image_w: int,
-    image_h: int,
-    known_shoulder_width_m: float | None = None,
-    height_cm: float | None = None,
-    shoulder_ratio: float = DEFAULT_SHOULDER_RATIO,
-) -> tuple[float | None, float | None]:
-    """Estimate meters-per-pixel from shoulder width.
-
-    Returns ``(meters_per_pixel, measured_pixel_shoulder_width)``.
+def estimate_pixel_to_meter(landmarks, image_w, image_h, known_shoulder_width_m=None, height_cm=None):
+    """
+    landmarks: numpy array (N,3) of normalized pose landmarks
+    If known_shoulder_width_m is None and height_cm provided, use default ratio shoulder ≈ 0.22*height.
+    Returns pixel_to_meter (meters per pixel) and measured pixel shoulder distance.
     """
     if landmarks is None or len(landmarks) <= max(LEFT_SHOULDER, RIGHT_SHOULDER):
         return None, None
 
-    measured_pixels = pixel_distance(
-        landmarks[LEFT_SHOULDER],
-        landmarks[RIGHT_SHOULDER],
-        image_w,
-        image_h,
-    )
-    if measured_pixels <= 1e-9:
+    left = landmarks[LEFT_SHOULDER]
+    right = landmarks[RIGHT_SHOULDER]
+    pix = pixel_distance(left, right, image_w, image_h)
+    if pix <= 1e-6:
         return None, None
 
-    width_m = known_shoulder_width_m
-    if width_m is None:
+    if known_shoulder_width_m is None:
         if height_cm is not None:
-            width_m = shoulder_ratio * float(height_cm) / 100.0
+            height_m = float(height_cm) / 100.0
+            # default ratio (approx) — adjustable by user later
+            known_shoulder_width_m = 0.22 * height_m
         else:
-            width_m = DEFAULT_FALLBACK_SHOULDER_WIDTH_M
+            # fallback: assume average adult shoulder width ~0.45 m
+            known_shoulder_width_m = 0.45
 
-    return width_m / measured_pixels, measured_pixels
+    pixel_to_meter = known_shoulder_width_m / pix  # meters per pixel
+    return pixel_to_meter, pix
